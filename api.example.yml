@@ -1,0 +1,76 @@
+# Edit/rename/move/symlink this configuration file to api.yml and/or ~/.api
+# 
+# The CLI tool (api) will look in the home dir for .api or the current dir for api.yml
+# The web server index.php will look in it's own directory for api.yml
+#
+# You should probably keep the real api.yml somewhere safe and then 
+# symlink it to the two locations it's expected to be found.
+
+# API credentials
+host:     'api.mycomputer.com'
+user:     'myusername'
+password: 'mysecretpassword'
+
+
+# Controllers and their credentials
+controllers:
+
+  # http://wiki.universal-devices.com/index.php?title=ISY_Developers:API:REST_Interface
+  # http://{name}:{pass}@{address}/rest/nodes/{node}/cmd/DFON
+  # http://{name}:{pass}@{address}/rest/programs/{id}/run
+  # http://{name}:{pass}@{address}/rest/networking/resources/{id}
+  # http://{name}:{pass}@{address}/rest/networking/wol/{id}
+  isy: 'http://username:password@isy.mycomputer.com/rest/'
+
+  # http://www.globalcache.com/files/docs/API-iTach.pdf
+  # sendir,{module}:{connector},{id},{frequency},{repeat},{offset},{command}
+  ir:  'http://ir.mycomputer.com/sendir,1:1,1,39000,1,1,'
+  irb: 'http://ir.mycomputer.com/sendir,1:3,1,39000,1,1,'
+
+  # http://www.llsoft.ca/doc/remotemapper/index.html
+  # http://{address}:{port}/{code}
+  rm:  'http://rm.mycomputer.com/'
+
+  # http://www.keyboardmaestro.com/documentation/6/keyboardmaestro.html#triggers_publicweb
+  # https://{name}:{pass}@{address}/authenticatedaction.html?macro={code}
+  km:  'https://username:password@km.mycomputer.com/authenticatedaction.html?macro='
+
+
+# Devices and their commands
+commands:
+
+  macpro:
+    wake:          'isy:networking/wol/1'
+    sleep:         'rm:osx/sleep'
+    display-sleep: 'rm:osx/display-sleep'
+    screensaver:   'rm:osx/screensaver'
+    volup:         'km:5DA482BA-443B-4F6B-8C52-EADE319001F6'
+
+  avr:
+    power:   'ir:32,31,32,32,32,31,64,31,32,31,32,31,32,31,32,31,32,62,32,31,64,31,32,3602'
+    volup:   'ir:32,31,64,63,64,31,32,31,32,31,32,31,32,62,64,31,32,31,32,31,32,3591'
+    voldown: 'ir:32,31,32,32,32,31,64,31,32,31,32,31,32,31,32,62,64,31,32,31,32,62,32,3602'
+
+  lcd:
+    'on':   'isy:nodes/29 3F 49 1/cmd/DFON'
+    'off':  'isy:nodes/29 3F 49 1/cmd/DFOF'
+    # toggle: 'isy:programs/0003/run'
+
+  lamp:
+    'on':   'isy:nodes/29 3C 3A 1/cmd/DFON'
+    'off':  'isy:nodes/29 3C 3A 1/cmd/DFOF'
+    # toggle: 'isy:programs/0003/run'
+
+  vp:
+    menu: 'ir:340,170,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,21,21,64,22,21,22,21,22,64,22,64,22,21,22,21,22,21,22,21,22,64,22,20,22,20,22,21,22,64,22,64,22,64,22,64,22,21,22,64,22,3787'
+    exit: 'ir:340,170,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,64,21,21,21,64,21,64,21,21,21,64,21,64,21,64,21,21,21,64,21,3787'
+    info: 'ir:340,170,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,21,21,64,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,64,21,21,21,64,21,64,21,64,21,64,21,64,21,64,21,21,21,64,21,3787'
+
+  ps3:
+    'off': 'ir:96,24,24,24,48,24,48,24,48,24,24,24,48,24,24,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,48,454'
+    'on':  'ir:96,24,48,24,48,24,48,24,48,24,24,24,48,24,24,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,48,430'
+    ps:   'ir:96,24,48,24,24,24,48,24,24,24,48,24,24,24,24,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,24,24,48,24,48,24,24,24,48,24,48,480'
+
+  pj:
+    'on':  'irb:346,173,22,21,22,64,22,21,22,21,22,64,22,64,22,21,22,21,22,64,22,21,22,64,22,64,22,21,22,21,22,64,22,64,22,21,22,21,22,21,22,64,22,21,22,21,22,21,22,21,22,64,22,64,22,64,22,21,22,64,22,64,22,64,22,64,22,3858'
+    'off': 'irb:346,174,22,21,22,64,22,21,22,21,22,64,22,64,22,21,22,21,22,64,22,21,22,64,22,64,22,21,22,21,22,64,22,64,22,21,22,21,22,21,22,64,22,21,22,21,22,21,22,21,22,64,22,64,22,64,22,21,22,64,22,64,22,64,22,64,22,3869'

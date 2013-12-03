@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+# 2013 Jon Suderman
+# https://github.com/suderman/api/
+
+require 'rubygems'
+require 'optparse'
+require 'net/http'
+require 'yaml'
+require 'fileutils'
+include FileUtils
+
+class API
+
+  def initialize(device, command, options)
+    yml = File.expand_path("~/.api") || File.expand_path("./api.yml")
+
+    # Ensure the yaml file exists
+    if File.file? yml
+
+      # Process the yaml file
+      begin
+        @api = YAML::load File.open(yml)
+        do_command(device, command)
+
+      # Error message if the yaml file is malformed
+      rescue Exception => se
+        puts red("[error]#{se.to_s.split(':').last}") 
+      end
+
+    end
+  end
+
+  def do_command(device, command)
+    url = URI.parse("http://#{@api['host']}/#{device}/#{command}")
+    req = Net::HTTP::Get.new(url.to_s)
+    req.basic_auth(@api['user'], @api['password'])
+    res = Net::HTTP.start(url.host, url.port) {|http| http.request(req) }
+  end
+
+  # Pretty colours
+  def red(text)    "\033[31m#{text}\033[m" end
+  def green(text)  "\033[32m#{text}\033[m" end
+  def yellow(text) "\033[33m#{text}\033[m" end
+  def blue(text)   "\033[34m#{text}\033[m" end
+  def gray(text)   "\033[37m#{text}\033[m" end
+
+end
+
+
+# Default values for options
+options = { :help => false }
+
+# Option parser
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: api [DEVICE] [COMMAND]"
+  opt.on("-h","--help","help") { options[:help] = true }
+end
+
+opt_parser.parse!
+
+API.new (ARGV[0] || ''), (ARGV[1] || ''), options
+puts opt_parser if options[:help]
